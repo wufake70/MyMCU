@@ -1,0 +1,83 @@
+C51 COMPILER V9.54   MAIN                                                                  10/22/2023 15:54:16 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: D:\Software\keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\List
+                    -ings\main.lst) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          /*
+   2          LCD1602 调试工具使用
+   3            
+   4            some question:
+   5              从原理图知，该工具使用用了P0组管脚(与数码管的每段LED共用管脚),
+   6              还有P2.5~P2.7管脚(LED模块的前三个led共用管脚)
+   7          
+   8            
+   9          */
+  10          
+  11          #include <REGX52.H>
+  12          #include "LCD1602.H"
+  13          
+  14          typedef unsigned char u8;
+  15          typedef unsigned int u16;
+  16          
+  17          // 定义按键的管脚
+  18          
+  19          void Delay(unsigned int t)  //@11.0592MHz 1ms
+  20          {
+  21   1        unsigned char data i, j;
+  22   1        while(t>0){
+  23   2          i = 11;
+  24   2          j = 190;
+  25   2          do
+  26   2          {
+  27   3            while (--j);
+  28   3          } while (--i);
+  29   2          t--;
+  30   2        }
+  31   1      }
+  32          void Delay10us(unsigned int t)  //@11.0592MHz 1us
+  33          {
+  34   1        unsigned char data i;
+  35   1        while(t>0){
+  36   2          i = 25;
+  37   2          while (--i);
+  38   2          t--;
+  39   2        }
+  40   1      }     
+  41          
+  42          void main()
+  43          {
+  44   1        // LCD初始化 
+  45   1        LCD_Init();
+  46   1        LCD_ShowChar(1,1,'F');  // 单字符显示，param 行、列、字符
+  47   1        LCD_ShowString(1,1,"Hello World");
+  48   1        LCD_ShowNum(1,1,9999,5);  // 打印 09999,从低位开始显示，不够补0；
+  49   1        LCD_ShowSignedNum(1,1,9999,5);
+  50   1        LCD_Init();
+  51   1        LCD_ShowHexNum(1,1,0x55,2);
+  52   1        LCD_Init();
+  53   1        LCD_ShowBinNum(1,1,0x5,5);
+  54   1      
+C51 COMPILER V9.54   MAIN                                                                  10/22/2023 15:54:16 PAGE 2   
+
+  55   1        while(1) {}
+  56   1        
+  57   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    135    ----
+   CONSTANT SIZE    =     12    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

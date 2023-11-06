@@ -1,0 +1,136 @@
+C51 COMPILER V9.54   MAIN                                                                  10/15/2023 22:39:20 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: D:\Software\keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\List
+                    -ings\main.lst) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          /*
+   2          静态数码管
+   3            单个数码管共八段(带小数点)，从顶上逆时针数，a、b、c、d、e、f、g、dp
+   4            dp为最高位，a为最低位。
+   5          
+   6          
+   7          */
+   8          
+   9          
+  10          #include <REGX52.H>
+  11          
+  12          typedef unsigned char u8;
+  13          typedef unsigned int u16;
+  14          
+  15          // 声明管脚
+  16          #define SMG_A_DP_PORT P0
+  17          
+  18          
+  19          // 共阴数码管码表(共阳的按位取反即可),0~f外加'无显示'
+  20          u8 gsmg_code[17]={0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,
+  21                          0x7f,0x6f,0x77,0x7c,0x39,0x5e,0x79,0x71,0x00};
+  22          
+  23                          
+  24          void Delay(unsigned int t)  //@12.000MHz
+  25          {
+  26   1        unsigned char data i, j;
+  27   1        while(t>0){
+  28   2          i = 2;
+  29   2          j = 239;
+  30   2          do
+  31   2          {
+  32   3            while (--j);
+  33   3          } while (--i);
+  34   2          t--;
+  35   2        }
+  36   1      }               
+  37                          
+  38                          
+  39          void main()
+  40          {
+  41   1      //  SMG_A_DP_PORT=gsmg_code[0];
+  42   1        
+  43   1        // 138译码器，3线(p2.4,p2.3,p2.2)到8线(数码管)
+  44   1        // 第4个数码管显示9
+  45   1      //  P2_4=1;
+  46   1      //  P2_3=1;
+  47   1      //  P2_2=1;
+  48   1      //  P0=gsmg_code[9];
+  49   1        
+  50   1        
+  51   1      // 动态数码管
+  52   1        while(1){
+  53   2          P2_4=1;
+  54   2          P2_3=1;
+C51 COMPILER V9.54   MAIN                                                                  10/15/2023 22:39:20 PAGE 2   
+
+  55   2          P2_2=1;
+  56   2          P0=gsmg_code[1];
+  57   2          Delay(2);
+  58   2          
+  59   2          P2_4=1;
+  60   2          P2_3=1;
+  61   2          P2_2=0;
+  62   2          P0=gsmg_code[2];
+  63   2          Delay(2);
+  64   2          
+  65   2          P2_4=1;
+  66   2          P2_3=0;
+  67   2          P2_2=1;
+  68   2          P0=gsmg_code[3];
+  69   2          Delay(2);
+  70   2          
+  71   2          P2_4=1;
+  72   2          P2_3=0;
+  73   2          P2_2=0;
+  74   2          P0=gsmg_code[4];
+  75   2          Delay(2);
+  76   2          
+  77   2          P2_4=0;
+  78   2          P2_3=1;
+  79   2          P2_2=1;
+  80   2          P0=gsmg_code[5];
+  81   2          Delay(2);
+  82   2          
+  83   2          P2_4=0;
+  84   2          P2_3=1;
+  85   2          P2_2=0;
+  86   2          P0=gsmg_code[6];
+  87   2          Delay(2);
+  88   2          
+  89   2          P2_4=0;
+  90   2          P2_3=0;
+  91   2          P2_2=1;
+  92   2          P0=gsmg_code[7];
+  93   2          Delay(2);
+  94   2          
+  95   2          P2_4=0;
+  96   2          P2_3=0;
+  97   2          P2_2=0;
+  98   2          P0=gsmg_code[8];
+  99   2          Delay(2);
+ 100   2              
+ 101   2        }
+ 102   1        
+ 103   1        
+ 104   1        while(1){};
+ 105   1      
+ 106   1      
+ 107   1      
+ 108   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    128    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     17    ----
+C51 COMPILER V9.54   MAIN                                                                  10/15/2023 22:39:20 PAGE 3   
+
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

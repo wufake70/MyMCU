@@ -1,0 +1,82 @@
+C51 COMPILER V9.54   MAIN                                                                  10/22/2023 16:07:52 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: D:\Software\keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\List
+                    -ings\main.lst) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          /*
+   2          main函数while循环监控独立按键，控制流水灯方向
+   3          
+   4          定时器中断函数执行流水灯
+   5          
+   6          */
+   7          
+   8          #include <REGX52.H>
+   9          #include "Timer.h"
+  10          #include "Keyboard.h"
+  11          
+  12          char turn=0;
+  13          int main()
+  14          {
+  15   1        P2=0xfe;
+  16   1        Timer0_Init();
+  17   1        
+  18   1        while(1)
+  19   1        {
+  20   2          switch(KeyMonitor())
+  21   2          {
+  22   3            case 0:break;
+  23   3            case 1:turn=!turn;break;
+  24   3            case 2:turn=!turn;break;
+  25   3            case 3:turn=!turn;break;
+  26   3            case 4:turn=!turn;break;
+  27   3          }
+  28   2        
+  29   2        }
+  30   1      
+  31   1        return 0;
+  32   1      }
+  33          
+  34          void Timer0_Isr(void) interrupt 1
+  35          {
+  36   1        static unsigned int T0Count=0;
+  37   1        TL0 = 0x66;       //设置定时初始值
+  38   1        TH0 = 0xFC;       //设置定时初始值
+  39   1        T0Count++;
+  40   1        if(T0Count>=1000){
+  41   2          T0Count=0;
+  42   2      //    if(P2==0xfe) P2=0x7f;
+  43   2          if(~P2==0x80&turn==0)
+  44   2            { 
+  45   3              P2=0xfe;
+  46   3            }else if(~P2==0x01&turn==1){
+  47   3              P2=0x7f;
+  48   3            }else if(turn==0){
+  49   3              P2=~(~P2<<1);
+  50   3            }else{
+  51   3              P2=~(~P2>>1);
+  52   3            }
+  53   2          
+  54   2        }
+C51 COMPILER V9.54   MAIN                                                                  10/22/2023 16:07:52 PAGE 2   
+
+  55   1      }
+*** WARNING C294 IN LINE 31 OF main.c: unreachable code
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    213    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      3    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  1 WARNING(S),  0 ERROR(S)

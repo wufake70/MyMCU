@@ -1,0 +1,73 @@
+C51 COMPILER V9.54   MAIN                                                                  10/15/2023 17:04:47 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: D:\Software\keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\List
+                    -ings\main.lst) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          /*
+   2          压电式蜂鸣器
+   3            需要一定频率的脉冲信号，才能发声。(1.5k~5khz)
+   4          
+   5          */
+   6          
+   7          
+   8          
+   9          #include <REGX52.H>
+  10          
+  11          typedef unsigned int u16; // 创建类型别名
+  12          
+  13          sbit BEEP=P2^5; // 声明一个位变量，与P2寄存器的第六位关联
+  14          
+  15          void Delay10us(u16 t) //@11.0592MHz
+  16          {
+  17   1        unsigned char data i;
+  18   1        while(t--){
+  19   2          i = 2;
+  20   2          while (--i);
+  21   2        }
+  22   1        
+  23   1      }
+  24          
+  25          void main()
+  26          {
+  27   1        u16 i=100;
+  28   1        while(1){
+  29   2        
+  30   2          while(i--){
+  31   3          
+  32   3            // T=2ms，f=0.5khz
+  33   3      //      BEEP=!BEEP;
+  34   3      //      Delay10us(100); 
+  35   3            
+  36   3            // 控制声响,占空比(高电平时间)
+  37   3            BEEP=0;
+  38   3            Delay10us(100);
+  39   3            BEEP=1;
+  40   3            Delay10us(100);
+  41   3            
+  42   3          }
+  43   2          while(1){}
+  44   2        }
+  45   1      
+  46   1      
+  47   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     57    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+C51 COMPILER V9.54   MAIN                                                                  10/15/2023 17:04:47 PAGE 2   
+
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

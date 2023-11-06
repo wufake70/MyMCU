@@ -1,0 +1,232 @@
+C51 COMPILER V9.54   MAIN                                                                  10/17/2023 22:06:47 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: D:\Software\keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\List
+                    -ings\main.lst) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          // 可调控的数码管电子表
+   2          /*
+   3          独立按键
+   4            按键的按下(释放)抖动，此时会产生连续的不可控制的高低电平信号，需要消除抖动。
+   5            
+   6            软件消抖
+   7            硬件消抖
+   8            
+   9          */
+  10          
+  11          #include <REGX52.H>
+  12          
+  13          typedef unsigned char u8;
+  14          typedef unsigned int u16;
+  15          
+  16          // 定义按键的管脚
+  17          sbit Btn1=P3^1; // 时针键
+  18          sbit Btn2=P3^0; // 分针键
+  19          sbit Btn3=P3^2; // 秒针键
+  20          sbit Btn4=P3^3; // 开始/暂停键
+  21          
+  22          // 宏定义按键的序号
+  23          #define Key0 0  // 无按键按下
+  24          #define Key1 1
+  25          #define Key2 2
+  26          #define Key3 3
+  27          #define Key4 4
+  28          
+  29          // 共阴数码管码表(共阳的按位取反即可),0~f外加'无显示'
+  30          u8 gsmg_code[17]={0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,
+  31                          0x7f,0x6f,0x77,0x7c,0x39,0x5e,0x79,0x71,0x00};
+  32          // dp段为 P0_7,(小数点)
+  33                          
+  34          void Delay(unsigned int t)  //@11.0592MHz 1ms
+  35          {
+  36   1        unsigned char data i, j;
+  37   1        while(t>0){
+  38   2          i = 11;
+  39   2          j = 190;
+  40   2          do
+  41   2          {
+  42   3            while (--j);
+  43   3          } while (--i);
+  44   2          t--;
+  45   2        }
+  46   1      }
+  47          void Delay10us(unsigned int t)  //@11.0592MHz 1us
+  48          {
+  49   1        unsigned char data i;
+  50   1        while(t>0){
+  51   2          i = 25;
+  52   2          while (--i);
+  53   2          t--;
+  54   2        }
+C51 COMPILER V9.54   MAIN                                                                  10/17/2023 22:06:47 PAGE 2   
+
+  55   1      }     
+  56          
+  57          // 按键监测
+  58          u8 buttonMonitor()
+  59          {
+  60   1        if(!Btn1){
+  61   2          Delay10us(3300); // 等待抖动结束，至少30ms
+  62   2          return Key1;
+  63   2          
+  64   2        }else if(!Btn2){
+  65   2          Delay10us(3300);
+  66   2          return Key2;
+  67   2          
+  68   2        }else if(!Btn3){
+  69   2          Delay10us(3300);
+  70   2          return Key3;
+  71   2          
+  72   2        }else if(!Btn4){
+  73   2          Delay10us(30000);
+  74   2          return Key4;
+  75   2          
+  76   2        }else{
+  77   2          return Key0;
+  78   2        }
+  79   1        
+  80   1      }
+  81                        
+  82          void setHour(u8 h);
+  83          void setMinutes(u8 m);
+  84          void setSeconds(u8 s);
+  85          
+  86          void main()
+  87          {
+  88   1        //运行前设置当前时间
+  89   1        unsigned long time_stamp=0;
+  90   1        u16 counts;
+  91   1        u8 is_run=0;
+  92   1        
+  93   1        u8 hour_counts=0;
+  94   1        u8 minute_counts=0;
+  95   1        u8 second_counts=0;
+  96   1        
+  97   1        while(1){
+  98   2          switch(buttonMonitor())
+  99   2          {
+ 100   3            case 0:
+ 101   3              if(!is_run){
+ 102   4                setHour(time_stamp/3600);
+ 103   4                setMinutes(time_stamp%3600/60);
+ 104   4                setSeconds(time_stamp%3600%60);
+ 105   4                break;
+ 106   4              }
+ 107   3              // 循环(11*60+20)*100 落后10s(假设手机定时器为标准)
+ 108   3              // counts=100;
+ 109   3              counts=98;
+ 110   3              
+ 111   3              // 1秒
+ 112   3              while(counts--){
+ 113   4                setHour(time_stamp/3600);
+ 114   4                setMinutes(time_stamp%3600/60);
+ 115   4                setSeconds(time_stamp%3600%60);
+ 116   4              
+C51 COMPILER V9.54   MAIN                                                                  10/17/2023 22:06:47 PAGE 3   
+
+ 117   4              }
+ 118   3              time_stamp++;
+ 119   3              if(time_stamp==86400) time_stamp=0;
+ 120   3              break;
+ 121   3            case 1: // 调整时针键
+ 122   3              hour_counts++;
+ 123   3              if(hour_counts==24) {
+ 124   4                time_stamp=0;
+ 125   4              }else{
+ 126   4                time_stamp+=3600;
+ 127   4              }
+ 128   3              break;
+ 129   3            case 2:
+ 130   3              minute_counts++;
+ 131   3              time_stamp+=60;
+ 132   3              break;
+ 133   3            case 3:
+ 134   3              second_counts++;
+ 135   3              time_stamp+=1;
+ 136   3              break;
+ 137   3            case 4:   // 暂停时需长按 1s
+ 138   3              is_run=!is_run;
+ 139   3              break;
+ 140   3            default:
+ 141   3              break;
+ 142   3          }
+ 143   2        }
+ 144   1      }
+ 145          
+ 146          
+ 147          void setHour(u8 h)
+ 148          {
+ 149   1        // 6号数码管
+ 150   1        P2_4=1;
+ 151   1        P2_3=1;
+ 152   1        P2_2=0;
+ 153   1        P0=gsmg_code[h/10];
+ 154   1        Delay10us(16);
+ 155   1        
+ 156   1        // 5号数码管
+ 157   1        P2_4=1;
+ 158   1        P2_3=0;
+ 159   1        P2_2=1;
+ 160   1        P0=gsmg_code[h%10];
+ 161   1        P0_7=1;
+ 162   1        Delay10us(16);
+ 163   1      }
+ 164          
+ 165          void setMinutes(u8 m)
+ 166          {
+ 167   1        // 4号数码管
+ 168   1        P2_4=1;
+ 169   1        P2_3=0;
+ 170   1        P2_2=0;
+ 171   1        P0=gsmg_code[m/10];
+ 172   1        Delay10us(16);
+ 173   1        
+ 174   1        // 3号数码管
+ 175   1        P2_4=0;
+ 176   1        P2_3=1;
+ 177   1        P2_2=1;
+ 178   1        P0=gsmg_code[m%10];
+C51 COMPILER V9.54   MAIN                                                                  10/17/2023 22:06:47 PAGE 4   
+
+ 179   1        P0_7=1;
+ 180   1        Delay10us(16);
+ 181   1      }
+ 182          
+ 183          void setSeconds(u8 s)
+ 184          {
+ 185   1        // 2号数码管
+ 186   1        P2_4=0;
+ 187   1        P2_3=1;
+ 188   1        P2_2=0;
+ 189   1        P0=gsmg_code[s/10];
+ 190   1        Delay10us(16);
+ 191   1        
+ 192   1        // 1号数码管
+ 193   1        P2_4=0;
+ 194   1        P2_3=0;
+ 195   1        P2_2=1;
+ 196   1        P0=gsmg_code[s%10];
+ 197   1      //  P0_7=1;
+ 198   1        Delay10us(20);
+ 199   1        
+ 200   1      }
+ 201          
+ 202          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    536    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     17      10
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

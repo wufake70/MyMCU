@@ -1,0 +1,133 @@
+C51 COMPILER V9.54   MAIN                                                                  10/17/2023 21:07:40 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: D:\Software\keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\List
+                    -ings\main.lst) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          /*
+   2          独立按键
+   3            按键的按下(释放)抖动，此时会产生连续的不可控制的高低电平信号，需要消除抖动。
+   4            
+   5            软件消抖
+   6            硬件消抖
+   7            
+   8          */
+   9          
+  10          #include <REGX52.H>
+  11          
+  12          typedef unsigned char u8;
+  13          typedef unsigned int u16;
+  14          
+  15          // 定义按键的管脚
+  16          sbit Btn1=P3^1;
+  17          sbit Btn2=P3^0;
+  18          sbit Btn3=P3^2;
+  19          sbit Btn4=P3^3;
+  20          
+  21          // 宏定义按键的序号
+  22          #define Key0 0  // 无按键按下
+  23          #define Key1 1
+  24          #define Key2 2
+  25          #define Key3 3
+  26          #define Key4 4
+  27          
+  28          #define LED1 P2_0
+  29          #define LED2 P2_1
+  30          #define LED3 P2_2
+  31          #define LED4 P2_3
+  32                          
+  33          void Delay(unsigned int t)  //@11.0592MHz 1ms
+  34          {
+  35   1        unsigned char data i, j;
+  36   1        while(t>0){
+  37   2          i = 11;
+  38   2          j = 190;
+  39   2          do
+  40   2          {
+  41   3            while (--j);
+  42   3          } while (--i);
+  43   2          t--;
+  44   2        }
+  45   1      }
+  46          void Delay10us(unsigned int t)  //@11.0592MHz 1us
+  47          {
+  48   1        unsigned char data i;
+  49   1        while(t>0){
+  50   2          i = 25;
+  51   2          while (--i);
+  52   2          t--;
+  53   2        }
+  54   1      }     
+C51 COMPILER V9.54   MAIN                                                                  10/17/2023 21:07:40 PAGE 2   
+
+  55          
+  56          // 按键监测
+  57          u8 buttonMonitor()
+  58          {
+  59   1        if(!Btn1){
+  60   2          Delay10us(3300); // 等待抖动结束，至少30ms
+  61   2          return Key1;
+  62   2          
+  63   2        }else if(!Btn2){
+  64   2          Delay10us(3300);
+  65   2          return Key2;
+  66   2          
+  67   2        }else if(!Btn3){
+  68   2          Delay10us(3300);
+  69   2          return Key3;
+  70   2          
+  71   2        }else if(!Btn4){
+  72   2          Delay10us(3300);
+  73   2          return Key4;
+  74   2          
+  75   2        }else{
+  76   2          return Key0;
+  77   2        }
+  78   1        
+  79   1      }
+  80                        
+  81                          
+  82          void main()
+  83          {
+  84   1        while(1){
+  85   2          switch(buttonMonitor())
+  86   2          {
+  87   3            case 0:
+  88   3              break;
+  89   3            case 1:
+  90   3              LED1=!LED1;
+  91   3              break;
+  92   3            case 2:
+  93   3              LED2=!LED2;
+  94   3              break;
+  95   3            case 3:
+  96   3              LED3=!LED3;
+  97   3              break;
+  98   3            case 4:
+  99   3              LED4=!LED4;
+ 100   3              break;
+ 101   3            default:
+ 102   3              break;
+ 103   3          }
+ 104   2        }
+ 105   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    123    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+C51 COMPILER V9.54   MAIN                                                                  10/17/2023 21:07:40 PAGE 3   
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
